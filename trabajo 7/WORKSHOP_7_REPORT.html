@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Workshop 7: Data-Interchange using JSON/XML - Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 18mm 20mm 18mm;
+      @bottom-right {
+        content: "Página " counter(page);
+        font-family: 'Segoe UI', Arial, sans-serif;
+        font-size: 8.5pt;
+        color: #64748b;
+      }
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 10pt;
+      line-height: 1.6;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+      color: #ffffff;
+      padding: 24px 28px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .header-banner h1 {
+      margin: 0 0 6px 0;
+      font-size: 18pt;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      border-bottom: none;
+    }
+    .header-banner h2 {
+      margin: 0 0 14px 0;
+      font-size: 12pt;
+      font-weight: 400;
+      color: #bfdbfe;
+      border-bottom: none;
+    }
+    .header-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      font-size: 8.5pt;
+      border-top: 1px solid rgba(255,255,255,0.25);
+      padding-top: 10px;
+    }
+    .header-meta div span {
+      color: #93c5fd;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 15pt;
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 26px;
+      margin-bottom: 12px;
+      page-break-after: avoid;
+    }
+    h2 {
+      font-size: 12.5pt;
+      font-weight: 700;
+      color: #1e3a8a;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 4px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 14px;
+      margin-bottom: 8px;
+      page-break-after: avoid;
+    }
+    p {
+      margin: 0 0 10px 0;
+      text-align: justify;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 8.5pt;
+      page-break-inside: avoid;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid #cbd5e1;
+    }
+    th {
+      background: #1e3a8a;
+      color: #ffffff;
+      font-weight: 600;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #1e3a8a;
+    }
+    td {
+      padding: 7px 10px;
+      border: 1px solid #e2e8f0;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    tr:hover {
+      background: #f1f5f9;
+    }
+    ul, ol {
+      margin: 0 0 12px 0;
+      padding-left: 24px;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+    code {
+      background: #f1f5f9;
+      color: #b91c1c;
+      font-family: 'Cascadia Code', Consolas, Monaco, monospace;
+      font-size: 9pt;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      border: none;
+      padding: 0;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+      margin: 20px 0;
+    }
+    .callout {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 10px 14px;
+      margin: 14px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 9.5pt;
+    }
+  </style>
+</head>
+<body>
+  <h1>INFORME TÉCNICO: TALLER 7 (WORKSHOP 7)</h1>
+<h2>Intercambio de Datos Estructurados usando JSON y XML en Sistemas Distribuidos</h2>
+<hr />
+<p><strong>Materia:</strong> Sistemas Distribuidos<br />
+<strong>Semestre:</strong> Semestre II - 2026<br />
+<strong>Profesor:</strong> Prof. Francisco Hidrobo<br />
+<strong>Fecha:</strong> Noviembre 2026<br />
+<strong>Proyecto:</strong> <em>AIR_QUALITY_DISTRIBUTED</em> - Sistema Distribuido y Tolerante a Fallos para Aprendizaje Federado sobre Calidad del Aire</p>
+<hr />
+<h2>Resumen Ejecutivo</h2>
+<p>En este taller se diseñó, implementó y evaluó el intercambio estructurado de información entre componentes distribuidos ejecutados en nodos independientes de la arquitectura del proyecto. Se desarrollaron dos actividades principales:</p>
+<ol>
+<li><strong>Actividad 1 (Servicio con Esquemas Predefinidos):</strong> Se implementó el servicio <code>get_global_model</code> para la sincronización de pesos y parámetros entre el <strong>Nodo 0 (Servidor Coordinador)</strong> y los <strong>Nodos Clientes (Nodo 1: PC / Nodo 2: Raspberry Pi)</strong>, validando tanto la solicitud como la respuesta contra esquemas formales predefinidos (<strong>JSON Schema</strong> [Draft-07] y <strong>XML Schema Definition - XSD</strong>). Se incorporaron casos de control negativo para verificar la capacidad del esquema para rechazar payloads malformados o no autorizados.</li>
+<li><strong>Actividad 2 (Servicio sin Esquema Predefinido):</strong> Se implementó el servicio <code>training_report</code> para la notificación de métricas locales de entrenamiento (número de muestras procesadas, función de pérdida local y ronda), aplicando validación programática semántica directamente en el código de la aplicación.</li>
+<li><strong>Evaluación Experimental:</strong> Se instrumentaron mediciones precisas sobre el canal TCP midiendo: (a) cantidad de datos transferidos en bytes, (b) latencia de ida y vuelta de la red (<em>Round Trip Time - RTT</em>), y (c) sobrecarga de procesamiento desagregada en serialización, validación y deserialización.</li>
+</ol>
+<hr />
+<h2>1. Arquitectura Distribuida y Selección de Componentes</h2>
+<p>La arquitectura del proyecto está compuesta por tres nodos físicos interconectados mediante una red de área local (LAN) o enlace Wi-Fi privado:</p>
+<pre><code>&lt;div style=&quot;text-align: center; margin: 20px 0; page-break-inside: avoid;&quot;&gt;
+  &lt;svg width=&quot;780&quot; height=&quot;340&quot; viewBox=&quot;0 0 780 340&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; style=&quot;max-width: 100%; font-family: 'Segoe UI', Roboto, sans-serif;&quot;&gt;
+    &lt;defs&gt;
+      &lt;linearGradient id=&quot;gradServer&quot; x1=&quot;0%&quot; y1=&quot;0%&quot; x2=&quot;100%&quot; y2=&quot;100%&quot;&gt;
+        &lt;stop offset=&quot;0%&quot; stop-color=&quot;#1e3a8a&quot;/&gt;
+        &lt;stop offset=&quot;100%&quot; stop-color=&quot;#2563eb&quot;/&gt;
+      &lt;/linearGradient&gt;
+      &lt;linearGradient id=&quot;gradClient1&quot; x1=&quot;0%&quot; y1=&quot;0%&quot; x2=&quot;100%&quot; y2=&quot;100%&quot;&gt;
+        &lt;stop offset=&quot;0%&quot; stop-color=&quot;#065f46&quot;/&gt;
+        &lt;stop offset=&quot;100%&quot; stop-color=&quot;#059669&quot;/&gt;
+      &lt;/linearGradient&gt;
+      &lt;linearGradient id=&quot;gradClient2&quot; x1=&quot;0%&quot; y1=&quot;0%&quot; x2=&quot;100%&quot; y2=&quot;100%&quot;&gt;
+        &lt;stop offset=&quot;0%&quot; stop-color=&quot;#831843&quot;/&gt;
+        &lt;stop offset=&quot;100%&quot; stop-color=&quot;#be185d&quot;/&gt;
+      &lt;/linearGradient&gt;
+      &lt;filter id=&quot;shadow&quot; x=&quot;-5%&quot; y=&quot;-5%&quot; width=&quot;110%&quot; height=&quot;115%&quot;&gt;
+        &lt;feDropShadow dx=&quot;0&quot; dy=&quot;3&quot; stdDeviation=&quot;4&quot; flood-color=&quot;#000&quot; flood-opacity=&quot;0.12&quot;/&gt;
+      &lt;/filter&gt;
+      &lt;marker id=&quot;arrowhead&quot; markerWidth=&quot;8&quot; markerHeight=&quot;6&quot; refX=&quot;7&quot; refY=&quot;3&quot; orient=&quot;auto&quot;&gt;
+        &lt;polygon points=&quot;0 0, 8 3, 0 6&quot; fill=&quot;#475569&quot;/&gt;
+      &lt;/marker&gt;
+      &lt;marker id=&quot;arrowhead-start&quot; markerWidth=&quot;8&quot; markerHeight=&quot;6&quot; refX=&quot;1&quot; refY=&quot;3&quot; orient=&quot;auto&quot;&gt;
+        &lt;polygon points=&quot;8 0, 0 3, 8 6&quot; fill=&quot;#475569&quot;/&gt;
+      &lt;/marker&gt;
+    &lt;/defs&gt;
+
+    &lt;!-- Fondo del canvas --&gt;
+    &lt;rect width=&quot;780&quot; height=&quot;340&quot; rx=&quot;12&quot; fill=&quot;#f8fafc&quot; stroke=&quot;#e2e8f0&quot; stroke-width=&quot;1.5&quot;/&gt;
+
+    &lt;!-- NODO 1: CLIENTE 1 (PC 2) --&gt;
+    &lt;g filter=&quot;url(#shadow)&quot;&gt;
+      &lt;rect x=&quot;30&quot; y=&quot;30&quot; width=&quot;230&quot; height=&quot;125&quot; rx=&quot;8&quot; fill=&quot;#ffffff&quot; stroke=&quot;#059669&quot; stroke-width=&quot;2&quot;/&gt;
+      &lt;rect x=&quot;30&quot; y=&quot;30&quot; width=&quot;230&quot; height=&quot;32&quot; rx=&quot;8&quot; fill=&quot;url(#gradClient1)&quot;/&gt;
+      &lt;rect x=&quot;30&quot; y=&quot;54&quot; width=&quot;230&quot; height=&quot;8&quot; fill=&quot;url(#gradClient1)&quot;/&gt;
+      &lt;text x=&quot;145&quot; y=&quot;52&quot; fill=&quot;#ffffff&quot; font-size=&quot;12&quot; font-weight=&quot;bold&quot; text-anchor=&quot;middle&quot;&gt;Nodo 1: Cliente 1 (PC)&lt;/text&gt;
+      &lt;text x=&quot;45&quot; y=&quot;80&quot; fill=&quot;#1e293b&quot; font-size=&quot;10.5&quot; font-weight=&quot;600&quot;&gt;• TCP Client Socket&lt;/text&gt;
+      &lt;text x=&quot;45&quot; y=&quot;98&quot; fill=&quot;#1e293b&quot; font-size=&quot;10.5&quot;&gt;• Validador Esquemas / Código&lt;/text&gt;
+      &lt;text x=&quot;45&quot; y=&quot;116&quot; fill=&quot;#1e293b&quot; font-size=&quot;10.5&quot;&gt;• Datos Locales (Partición 1)&lt;/text&gt;
+      &lt;text x=&quot;45&quot; y=&quot;134&quot; fill=&quot;#64748b&quot; font-size=&quot;9.5&quot;&gt;IP: 192.168.1.101 | Windows/Linux&lt;/text&gt;
+    &lt;/g&gt;
+
+    &lt;!-- NODO 2: CLIENTE 2 (Raspberry Pi Edge) --&gt;
+    &lt;g filter=&quot;url(#shadow)&quot;&gt;
+      &lt;rect x=&quot;30&quot; y=&quot;185&quot; width=&quot;230&quot; height=&quot;125&quot; rx=&quot;8&quot; fill=&quot;#ffffff&quot; stroke=&quot;#be185d&quot; stroke-width=&quot;2&quot;/&gt;
+      &lt;rect x=&quot;30&quot; y=&quot;185&quot; width=&quot;230&quot; height=&quot;32&quot; rx=&quot;8&quot; fill=&quot;url(#gradClient2)&quot;/&gt;
+      &lt;rect x=&quot;30&quot; y=&quot;209&quot; width=&quot;230&quot; height=&quot;8&quot; fill=&quot;url(#gradClient2)&quot;/&gt;
+      &lt;text x=&quot;145&quot; y=&quot;207&quot; fill=&quot;#ffffff&quot; font-size=&quot;12&quot; font-weight=&quot;bold&quot; text-anchor=&quot;middle&quot;&gt;Nodo 2: Cliente 2 (Raspberry Pi)&lt;/text&gt;
+      &lt;text x=&quot;45&quot; y=&quot;235&quot; fill=&quot;#1e293b&quot; font-size=&quot;10.5&quot; font-weight=&quot;600&quot;&gt;• TCP Client Socket&lt;/text&gt;
+      &lt;text x=&quot;45&quot; y=&quot;253&quot; fill=&quot;#1e293b&quot; font-size=&quot;10.5&quot;&gt;• Validador Esquemas / Código&lt;/text&gt;
+      &lt;text x=&quot;45&quot; y=&quot;271&quot; fill=&quot;#1e293b&quot; font-size=&quot;10.5&quot;&gt;• Nodo Edge Recursos Restringidos&lt;/text&gt;
+      &lt;text x=&quot;45&quot; y=&quot;289&quot; fill=&quot;#64748b&quot; font-size=&quot;9.5&quot;&gt;IP: 192.168.1.102 | Raspberry Pi OS&lt;/text&gt;
+    &lt;/g&gt;
+
+    &lt;!-- NODO 0: SERVIDOR COORDINADOR (PC 1) --&gt;
+    &lt;g filter=&quot;url(#shadow)&quot;&gt;
+      &lt;rect x=&quot;490&quot; y=&quot;45&quot; width=&quot;260&quot; height=&quot;250&quot; rx=&quot;8&quot; fill=&quot;#ffffff&quot; stroke=&quot;#2563eb&quot; stroke-width=&quot;2&quot;/&gt;
+      &lt;rect x=&quot;490&quot; y=&quot;45&quot; width=&quot;260&quot; height=&quot;34&quot; rx=&quot;8&quot; fill=&quot;url(#gradServer)&quot;/&gt;
+      &lt;rect x=&quot;490&quot; y=&quot;71&quot; width=&quot;260&quot; height=&quot;8&quot; fill=&quot;url(#gradServer)&quot;/&gt;
+      &lt;text x=&quot;620&quot; y=&quot;68&quot; fill=&quot;#ffffff&quot; font-size=&quot;13&quot; font-weight=&quot;bold&quot; text-anchor=&quot;middle&quot;&gt;Nodo 0: Coordinador / Servidor&lt;/text&gt;
+      
+      &lt;rect x=&quot;505&quot; y=&quot;90&quot; width=&quot;230&quot; height=&quot;32&quot; rx=&quot;4&quot; fill=&quot;#eff6ff&quot; stroke=&quot;#bfdbfe&quot;/&gt;
+      &lt;text x=&quot;620&quot; y=&quot;110&quot; fill=&quot;#1e3a8a&quot; font-size=&quot;11&quot; font-weight=&quot;bold&quot; text-anchor=&quot;middle&quot;&gt;TCP Server (0.0.0.0:5000)&lt;/text&gt;
+
+      &lt;rect x=&quot;505&quot; y=&quot;130&quot; width=&quot;230&quot; height=&quot;48&quot; rx=&quot;4&quot; fill=&quot;#f8fafc&quot; stroke=&quot;#cbd5e1&quot;/&gt;
+      &lt;text x=&quot;515&quot; y=&quot;148&quot; fill=&quot;#0f172a&quot; font-size=&quot;10&quot; font-weight=&quot;bold&quot;&gt;Validación de Esquemas:&lt;/text&gt;
+      &lt;text x=&quot;515&quot; y=&quot;165&quot; fill=&quot;#475569&quot; font-size=&quot;9.5&quot;&gt;JSON Schema (Draft-07) &amp;amp; XSD (lxml)&lt;/text&gt;
+
+      &lt;rect x=&quot;505&quot; y=&quot;186&quot; width=&quot;230&quot; height=&quot;48&quot; rx=&quot;4&quot; fill=&quot;#f8fafc&quot; stroke=&quot;#cbd5e1&quot;/&gt;
+      &lt;text x=&quot;515&quot; y=&quot;204&quot; fill=&quot;#0f172a&quot; font-size=&quot;10&quot; font-weight=&quot;bold&quot;&gt;Despacho de Servicios:&lt;/text&gt;
+      &lt;text x=&quot;515&quot; y=&quot;221&quot; fill=&quot;#475569&quot; font-size=&quot;9.5&quot;&gt;1. get_global_model | 2. training_report&lt;/text&gt;
+
+      &lt;rect x=&quot;505&quot; y=&quot;242&quot; width=&quot;230&quot; height=&quot;42&quot; rx=&quot;4&quot; fill=&quot;#f8fafc&quot; stroke=&quot;#cbd5e1&quot;/&gt;
+      &lt;text x=&quot;515&quot; y=&quot;259&quot; fill=&quot;#0f172a&quot; font-size=&quot;10&quot; font-weight=&quot;bold&quot;&gt;Agregación &amp;amp; Checkpoints:&lt;/text&gt;
+      &lt;text x=&quot;515&quot; y=&quot;274&quot; fill=&quot;#475569&quot; font-size=&quot;9&quot;&gt;FedAvg, Idempotencia UUID, Logs&lt;/text&gt;
+    &lt;/g&gt;
+
+    &lt;!-- ENLACES DE COMUNICACIÓN (FLECHAS BIDIRECCIONALES) --&gt;
+    &lt;!-- Línea Cliente 1 &lt;-&gt; Servidor --&gt;
+    &lt;path d=&quot;M 260 92 L 490 120&quot; stroke=&quot;#475569&quot; stroke-width=&quot;2.5&quot; stroke-dasharray=&quot;6,4&quot; marker-end=&quot;url(#arrowhead)&quot; marker-start=&quot;url(#arrowhead-start)&quot;/&gt;
+    &lt;!-- Etiqueta Enlace 1 --&gt;
+    &lt;rect x=&quot;290&quot; y=&quot;76&quot; width=&quot;170&quot; height=&quot;26&quot; rx=&quot;4&quot; fill=&quot;#ffffff&quot; stroke=&quot;#94a3b8&quot; stroke-width=&quot;1&quot;/&gt;
+    &lt;text x=&quot;375&quot; y=&quot;93&quot; fill=&quot;#0f172a&quot; font-size=&quot;9.5&quot; font-weight=&quot;600&quot; text-anchor=&quot;middle&quot;&gt;TCP / JSON &amp;amp; XML Framing&lt;/text&gt;
+
+    &lt;!-- Línea Cliente 2 &lt;-&gt; Servidor --&gt;
+    &lt;path d=&quot;M 260 248 L 490 220&quot; stroke=&quot;#475569&quot; stroke-width=&quot;2.5&quot; stroke-dasharray=&quot;6,4&quot; marker-end=&quot;url(#arrowhead)&quot; marker-start=&quot;url(#arrowhead-start)&quot;/&gt;
+    &lt;!-- Etiqueta Enlace 2 --&gt;
+    &lt;rect x=&quot;290&quot; y=&quot;238&quot; width=&quot;170&quot; height=&quot;26&quot; rx=&quot;4&quot; fill=&quot;#ffffff&quot; stroke=&quot;#94a3b8&quot; stroke-width=&quot;1&quot;/&gt;
+    &lt;text x=&quot;375&quot; y=&quot;255&quot; fill=&quot;#0f172a&quot; font-size=&quot;9.5&quot; font-weight=&quot;600&quot; text-anchor=&quot;middle&quot;&gt;TCP / JSON &amp;amp; XML Framing&lt;/text&gt;
+  &lt;/svg&gt;
+&lt;/div&gt;
+</code></pre>
+<h3>Componentes Seleccionados para el Taller:</h3>
+<ul>
+<li><strong>Componente A - Servidor Coordinador (Nodo 0):</strong> Ejecutado en la máquina anfitriona (PC 1), actúa como el proveedor central de servicios de sincronización y registro. Escucha en un puerto TCP configurable (por defecto <code>5000</code>) y expone los servicios <code>get_global_model</code> y <code>training_report</code>.</li>
+<li><strong>Componente B - Cliente Federado (Nodo 1 / Nodo 2):</strong> Ejecutado en una máquina remota (PC 2 o Raspberry Pi), consume los servicios del coordinador para solicitar la versión actual del modelo y reportar el estado de su entrenamiento local.</li>
+</ul>
+<h3>Delimitación de Mensajes sobre TCP (<em>Message Framing</em>):</h3>
+<p>Dado que TCP es un protocolo orientado a flujo de bytes (<em>stream-oriented</em>) sin delimitación intrínseca de mensajes, se implementó una capa de delimitación con prefijo binario de longitud (<em>Length-Prefix Framing</em>):</p>
+<ul>
+<li>Cada mensaje va precedido por un encabezado de 4 bytes en formato Big-Endian (<code>&gt;I</code>), indicando con exactitud la longitud del payload XML o JSON.</li>
+<li>Esto previene cualquier condición de fragmentación de paquetes (<em>TCP segmentation</em>) o concatenación indebida (<em>sticky packets</em>).</li>
+</ul>
+<hr />
+<h2>2. Actividad 1: Servicio con Esquemas Predefinidos (<code>get_global_model</code>)</h2>
+<h3>2.1. Descripción del Servicio</h3>
+<p>El servicio <code>get_global_model</code> es el punto de entrada crítico de cada ronda federada. El cliente notifica su identificador, el servicio requerido, la ronda en curso y el formato deseado (<code>json</code> o <code>xml</code>). El Servidor valida la solicitud, extrae el estado actual del modelo y responde con la confirmación, versión de modelo y mensaje descriptivo.</p>
+<h3>2.2. Esquema Formal de Solicitud (Request Schema)</h3>
+<h4>JSON Schema (<code>schemas/request.schema.json</code>):</h4>
+<div style="margin: 12px 0; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0; page-break-inside: avoid;"><div class="highlight" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span>{
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"$schema"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"http://json-schema.org/draft-07/schema#"</span>,
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"title"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"RequestSchema"</span>,
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"object"</span>,
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"properties"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">"client_id"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"string"</span>,
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"enum"</span>:<span style="color: #BBB"> </span>[<span style="color: #4070A0">"client_1"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"client_2"</span>]
+<span style="color: #BBB">    </span>},
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">"service"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"string"</span>,
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"enum"</span>:<span style="color: #BBB"> </span>[<span style="color: #4070A0">"get_global_model"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"ping"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"disconnect"</span>]
+<span style="color: #BBB">    </span>},
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">"round"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"integer"</span>,
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"minimum"</span>:<span style="color: #BBB"> </span><span style="color: #40A070">0</span>
+<span style="color: #BBB">    </span>},
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">"format"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"string"</span>,
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"enum"</span>:<span style="color: #BBB"> </span>[<span style="color: #4070A0">"json"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"xml"</span>]
+<span style="color: #BBB">    </span>}
+<span style="color: #BBB">  </span>},
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"required"</span>:<span style="color: #BBB"> </span>[<span style="color: #4070A0">"client_id"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"service"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"round"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"format"</span>],
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"additionalProperties"</span>:<span style="color: #BBB"> </span><span style="color: #007020; font-weight: bold">true</span>
+}
+</pre></div>
+</div>
+<h4>XML Schema Definition (<code>schemas/message.xsd</code> - Fragmento de Solicitud):</h4>
+<div style="margin: 12px 0; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0; page-break-inside: avoid;"><div class="highlight" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><span style="color: #007020">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span style="color: #062873; font-weight: bold">&lt;xs:schema</span><span style="color: #BBB"> </span><span style="color: #4070A0">xmlns:xs="http://www.w3.org/2001/XMLSchema"</span><span style="color: #BBB"> </span><span style="color: #4070A0">elementFormDefault="qualified"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="request"</span><span style="color: #BBB"> </span><span style="color: #4070A0">type="RequestType"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">&lt;xs:complexType</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="RequestType"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">&lt;xs:sequence&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="client_id"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+<span style="color: #BBB">        </span><span style="color: #062873; font-weight: bold">&lt;xs:simpleType&gt;</span>
+<span style="color: #BBB">          </span><span style="color: #062873; font-weight: bold">&lt;xs:restriction</span><span style="color: #BBB"> </span><span style="color: #4070A0">base="xs:string"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+<span style="color: #BBB">            </span><span style="color: #062873; font-weight: bold">&lt;xs:enumeration</span><span style="color: #BBB"> </span><span style="color: #4070A0">value="client_1"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">            </span><span style="color: #062873; font-weight: bold">&lt;xs:enumeration</span><span style="color: #BBB"> </span><span style="color: #4070A0">value="client_2"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">          </span><span style="color: #062873; font-weight: bold">&lt;/xs:restriction&gt;</span>
+<span style="color: #BBB">        </span><span style="color: #062873; font-weight: bold">&lt;/xs:simpleType&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;/xs:element&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="service"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+<span style="color: #BBB">        </span><span style="color: #062873; font-weight: bold">&lt;xs:simpleType&gt;</span>
+<span style="color: #BBB">          </span><span style="color: #062873; font-weight: bold">&lt;xs:restriction</span><span style="color: #BBB"> </span><span style="color: #4070A0">base="xs:string"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+<span style="color: #BBB">            </span><span style="color: #062873; font-weight: bold">&lt;xs:enumeration</span><span style="color: #BBB"> </span><span style="color: #4070A0">value="get_global_model"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">            </span><span style="color: #062873; font-weight: bold">&lt;xs:enumeration</span><span style="color: #BBB"> </span><span style="color: #4070A0">value="ping"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">            </span><span style="color: #062873; font-weight: bold">&lt;xs:enumeration</span><span style="color: #BBB"> </span><span style="color: #4070A0">value="disconnect"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">          </span><span style="color: #062873; font-weight: bold">&lt;/xs:restriction&gt;</span>
+<span style="color: #BBB">        </span><span style="color: #062873; font-weight: bold">&lt;/xs:simpleType&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;/xs:element&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="round"</span><span style="color: #BBB"> </span><span style="color: #4070A0">type="xs:nonNegativeInteger"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="format"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+<span style="color: #BBB">        </span><span style="color: #062873; font-weight: bold">&lt;xs:simpleType&gt;</span>
+<span style="color: #BBB">          </span><span style="color: #062873; font-weight: bold">&lt;xs:restriction</span><span style="color: #BBB"> </span><span style="color: #4070A0">base="xs:string"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+<span style="color: #BBB">            </span><span style="color: #062873; font-weight: bold">&lt;xs:enumeration</span><span style="color: #BBB"> </span><span style="color: #4070A0">value="json"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">            </span><span style="color: #062873; font-weight: bold">&lt;xs:enumeration</span><span style="color: #BBB"> </span><span style="color: #4070A0">value="xml"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">          </span><span style="color: #062873; font-weight: bold">&lt;/xs:restriction&gt;</span>
+<span style="color: #BBB">        </span><span style="color: #062873; font-weight: bold">&lt;/xs:simpleType&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;/xs:element&gt;</span>
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">&lt;/xs:sequence&gt;</span>
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">&lt;/xs:complexType&gt;</span>
+<span style="color: #062873; font-weight: bold">&lt;/xs:schema&gt;</span>
+</pre></div>
+</div>
+<hr />
+<h3>2.3. Esquema Formal de Respuesta (Response Schema)</h3>
+<h4>JSON Schema (<code>schemas/response.schema.json</code>):</h4>
+<div style="margin: 12px 0; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0; page-break-inside: avoid;"><div class="highlight" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span>{
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"$schema"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"http://json-schema.org/draft-07/schema#"</span>,
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"title"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"ResponseSchema"</span>,
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"object"</span>,
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"properties"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">"status"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"string"</span>,
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"enum"</span>:<span style="color: #BBB"> </span>[<span style="color: #4070A0">"success"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"received"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"error"</span>]
+<span style="color: #BBB">    </span>},
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">"round"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"integer"</span>,
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"minimum"</span>:<span style="color: #BBB"> </span><span style="color: #40A070">0</span>
+<span style="color: #BBB">    </span>},
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">"model_version"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"integer"</span>,
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"minimum"</span>:<span style="color: #BBB"> </span><span style="color: #40A070">0</span>
+<span style="color: #BBB">    </span>},
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">"message"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"string"</span>
+<span style="color: #BBB">    </span>},
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">"client_id"</span>:<span style="color: #BBB"> </span>{
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">"type"</span>:<span style="color: #BBB"> </span><span style="color: #4070A0">"string"</span>
+<span style="color: #BBB">    </span>}
+<span style="color: #BBB">  </span>},
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"required"</span>:<span style="color: #BBB"> </span>[<span style="color: #4070A0">"status"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"round"</span>,<span style="color: #BBB"> </span><span style="color: #4070A0">"message"</span>],
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">"additionalProperties"</span>:<span style="color: #BBB"> </span><span style="color: #007020; font-weight: bold">true</span>
+}
+</pre></div>
+</div>
+<h4>XML Schema Definition (<code>schemas/message.xsd</code> - Fragmento de Respuesta):</h4>
+<div style="margin: 12px 0; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0; page-break-inside: avoid;"><div class="highlight" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="response"</span><span style="color: #BBB"> </span><span style="color: #4070A0">type="ResponseType"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">&lt;xs:complexType</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="ResponseType"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">&lt;xs:sequence&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="status"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+<span style="color: #BBB">        </span><span style="color: #062873; font-weight: bold">&lt;xs:simpleType&gt;</span>
+<span style="color: #BBB">          </span><span style="color: #062873; font-weight: bold">&lt;xs:restriction</span><span style="color: #BBB"> </span><span style="color: #4070A0">base="xs:string"</span><span style="color: #062873; font-weight: bold">&gt;</span>
+<span style="color: #BBB">            </span><span style="color: #062873; font-weight: bold">&lt;xs:enumeration</span><span style="color: #BBB"> </span><span style="color: #4070A0">value="success"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">            </span><span style="color: #062873; font-weight: bold">&lt;xs:enumeration</span><span style="color: #BBB"> </span><span style="color: #4070A0">value="received"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">            </span><span style="color: #062873; font-weight: bold">&lt;xs:enumeration</span><span style="color: #BBB"> </span><span style="color: #4070A0">value="error"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">          </span><span style="color: #062873; font-weight: bold">&lt;/xs:restriction&gt;</span>
+<span style="color: #BBB">        </span><span style="color: #062873; font-weight: bold">&lt;/xs:simpleType&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;/xs:element&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="round"</span><span style="color: #BBB"> </span><span style="color: #4070A0">type="xs:nonNegativeInteger"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="model_version"</span><span style="color: #BBB"> </span><span style="color: #4070A0">type="xs:nonNegativeInteger"</span><span style="color: #BBB"> </span><span style="color: #4070A0">minOccurs="0"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="message"</span><span style="color: #BBB"> </span><span style="color: #4070A0">type="xs:string"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">      </span><span style="color: #062873; font-weight: bold">&lt;xs:element</span><span style="color: #BBB"> </span><span style="color: #4070A0">name="client_id"</span><span style="color: #BBB"> </span><span style="color: #4070A0">type="xs:string"</span><span style="color: #BBB"> </span><span style="color: #4070A0">minOccurs="0"</span><span style="color: #062873; font-weight: bold">/&gt;</span>
+<span style="color: #BBB">    </span><span style="color: #062873; font-weight: bold">&lt;/xs:sequence&gt;</span>
+<span style="color: #BBB">  </span><span style="color: #062873; font-weight: bold">&lt;/xs:complexType&gt;</span>
+</pre></div>
+</div>
+<hr />
+<h3>2.4. Código de Validación (Cliente y Servidor)</h3>
+<h4>Funciones de Validación (<code>protocol.py</code>):</h4>
+<div style="margin: 12px 0; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0; page-break-inside: avoid;"><div class="highlight" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><span style="color: #007020; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #06287E">validate_json_request</span>(data: Dict[<span style="color: #007020">str</span>, Any]) <span style="color: #666">-&gt;</span> Tuple[<span style="color: #007020">bool</span>, Optional[<span style="color: #007020">str</span>]]:
+<span style="color: #BBB">    </span><span style="color: #4070A0; font-style: italic">"""Valida la solicitud JSON contra schemas/request.schema.json."""</span>
+    <span style="color: #007020; font-weight: bold">try</span>:
+        jsonschema<span style="color: #666">.</span>validate(instance<span style="color: #666">=</span>data, schema<span style="color: #666">=</span>_REQUEST_JSON_SCHEMA)
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">True</span>, <span style="color: #007020; font-weight: bold">None</span>
+    <span style="color: #007020; font-weight: bold">except</span> jsonschema<span style="color: #666">.</span>ValidationError <span style="color: #007020; font-weight: bold">as</span> e:
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">False</span>, e<span style="color: #666">.</span>message
+
+<span style="color: #007020; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #06287E">validate_json_response</span>(data: Dict[<span style="color: #007020">str</span>, Any]) <span style="color: #666">-&gt;</span> Tuple[<span style="color: #007020">bool</span>, Optional[<span style="color: #007020">str</span>]]:
+<span style="color: #BBB">    </span><span style="color: #4070A0; font-style: italic">"""Valida la respuesta JSON contra schemas/response.schema.json."""</span>
+    <span style="color: #007020; font-weight: bold">try</span>:
+        jsonschema<span style="color: #666">.</span>validate(instance<span style="color: #666">=</span>data, schema<span style="color: #666">=</span>_RESPONSE_JSON_SCHEMA)
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">True</span>, <span style="color: #007020; font-weight: bold">None</span>
+    <span style="color: #007020; font-weight: bold">except</span> jsonschema<span style="color: #666">.</span>ValidationError <span style="color: #007020; font-weight: bold">as</span> e:
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">False</span>, e<span style="color: #666">.</span>message
+
+<span style="color: #007020; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #06287E">validate_xml_message</span>(xml_bytes: <span style="color: #007020">bytes</span>) <span style="color: #666">-&gt;</span> Tuple[<span style="color: #007020">bool</span>, Optional[<span style="color: #007020">str</span>]]:
+<span style="color: #BBB">    </span><span style="color: #4070A0; font-style: italic">"""Valida mensajes XML (request o response) contra schemas/message.xsd usando lxml."""</span>
+    <span style="color: #007020; font-weight: bold">try</span>:
+        doc <span style="color: #666">=</span> etree<span style="color: #666">.</span>fromstring(xml_bytes)
+        _XML_SCHEMA_VALIDATOR<span style="color: #666">.</span>assertValid(doc)
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">True</span>, <span style="color: #007020; font-weight: bold">None</span>
+    <span style="color: #007020; font-weight: bold">except</span> etree<span style="color: #666">.</span>DocumentInvalid <span style="color: #007020; font-weight: bold">as</span> e:
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">False</span>, <span style="color: #007020">str</span>(e)
+    <span style="color: #007020; font-weight: bold">except</span> <span style="color: #007020">Exception</span> <span style="color: #007020; font-weight: bold">as</span> e:
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">False</span>, <span style="color: #4070A0">f"Error de sintaxis XML: </span><span style="color: #70A0D0; font-style: italic">{</span><span style="color: #007020">str</span>(e)<span style="color: #70A0D0; font-style: italic">}</span><span style="color: #4070A0">"</span>
+</pre></div>
+</div>
+<hr />
+<h2>3. Actividad 2: Servicio sin Esquema Predefinido (<code>training_report</code>)</h2>
+<h3>3.1. Descripción del Servicio</h3>
+<p>El servicio <code>training_report</code> permite que los clientes notifiquen al servidor que han culminado las épocas locales de entrenamiento. A diferencia de la Actividad 1, <strong>no se utiliza un archivo de esquema externo</strong> (como JSON Schema o XSD). En su lugar, el contrato de datos se valida mediante <strong>reglas de lógica de negocio programadas directamente en código Python</strong>, tanto en el emisor antes de enviar como en el receptor antes de procesar.</p>
+<h3>3.2. Reglas Semánticas en Código</h3>
+<ol>
+<li><code>client_id</code>: Debe ser de tipo string, no nulo ni vacío, y restringido al conjunto de clientes autorizados (<code>client_1</code>, <code>client_2</code>).</li>
+<li><code>round</code>: Debe ser un número entero no negativo ($round \ge 0$).</li>
+<li><code>samples</code>: Debe ser un número entero estrictamente positivo ($samples &gt; 0$).</li>
+<li><code>local_loss</code>: Debe ser un valor numérico real no negativo y finito ($loss \ge 0$, descartando valores <code>NaN</code> o infinitos).</li>
+</ol>
+<h3>3.3. Implementación del Validador Programático (<code>protocol.py</code>):</h3>
+<div style="margin: 12px 0; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0; page-break-inside: avoid;"><div class="highlight" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><span style="color: #007020; font-weight: bold">def</span><span style="color: #BBB"> </span><span style="color: #06287E">validate_training_report_programmatic</span>(data: Dict[<span style="color: #007020">str</span>, Any]) <span style="color: #666">-&gt;</span> Tuple[<span style="color: #007020">bool</span>, Optional[<span style="color: #007020">str</span>]]:
+<span style="color: #BBB">    </span><span style="color: #4070A0; font-style: italic">"""</span>
+<span style="color: #4070A0; font-style: italic">    Validación semántica en código de aplicación sin esquemas externos.</span>
+<span style="color: #4070A0; font-style: italic">    """</span>
+    client_id <span style="color: #666">=</span> data<span style="color: #666">.</span>get(<span style="color: #4070A0">"client_id"</span>)
+    <span style="color: #007020; font-weight: bold">if</span> <span style="color: #007020; font-weight: bold">not</span> client_id <span style="color: #007020; font-weight: bold">or</span> <span style="color: #007020; font-weight: bold">not</span> <span style="color: #007020">isinstance</span>(client_id, <span style="color: #007020">str</span>) <span style="color: #007020; font-weight: bold">or</span> client_id <span style="color: #007020; font-weight: bold">not</span> <span style="color: #007020; font-weight: bold">in</span> [<span style="color: #4070A0">"client_1"</span>, <span style="color: #4070A0">"client_2"</span>]:
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">False</span>, <span style="color: #4070A0">f"client_id inválido o vacío: '</span><span style="color: #70A0D0; font-style: italic">{</span>client_id<span style="color: #70A0D0; font-style: italic">}</span><span style="color: #4070A0">'. Debe ser 'client_1' o 'client_2'."</span>
+
+    round_num <span style="color: #666">=</span> data<span style="color: #666">.</span>get(<span style="color: #4070A0">"round"</span>)
+    <span style="color: #007020; font-weight: bold">if</span> round_num <span style="color: #007020; font-weight: bold">is</span> <span style="color: #007020; font-weight: bold">None</span> <span style="color: #007020; font-weight: bold">or</span> <span style="color: #007020; font-weight: bold">not</span> <span style="color: #007020">isinstance</span>(round_num, <span style="color: #007020">int</span>) <span style="color: #007020; font-weight: bold">or</span> round_num <span style="color: #666">&lt;</span> <span style="color: #40A070">0</span>:
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">False</span>, <span style="color: #4070A0">f"round debe ser un entero &gt;= 0, recibido: </span><span style="color: #70A0D0; font-style: italic">{</span>round_num<span style="color: #70A0D0; font-style: italic">}</span><span style="color: #4070A0">"</span>
+
+    samples <span style="color: #666">=</span> data<span style="color: #666">.</span>get(<span style="color: #4070A0">"samples"</span>)
+    <span style="color: #007020; font-weight: bold">if</span> samples <span style="color: #007020; font-weight: bold">is</span> <span style="color: #007020; font-weight: bold">None</span> <span style="color: #007020; font-weight: bold">or</span> <span style="color: #007020; font-weight: bold">not</span> <span style="color: #007020">isinstance</span>(samples, <span style="color: #007020">int</span>) <span style="color: #007020; font-weight: bold">or</span> samples <span style="color: #666">&lt;=</span> <span style="color: #40A070">0</span>:
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">False</span>, <span style="color: #4070A0">f"samples debe ser un entero &gt; 0, recibido: </span><span style="color: #70A0D0; font-style: italic">{</span>samples<span style="color: #70A0D0; font-style: italic">}</span><span style="color: #4070A0">"</span>
+
+    local_loss <span style="color: #666">=</span> data<span style="color: #666">.</span>get(<span style="color: #4070A0">"local_loss"</span>)
+    <span style="color: #007020; font-weight: bold">if</span> local_loss <span style="color: #007020; font-weight: bold">is</span> <span style="color: #007020; font-weight: bold">None</span> <span style="color: #007020; font-weight: bold">or</span> <span style="color: #007020; font-weight: bold">not</span> <span style="color: #007020">isinstance</span>(local_loss, (<span style="color: #007020">int</span>, <span style="color: #007020">float</span>)) <span style="color: #007020; font-weight: bold">or</span> local_loss <span style="color: #666">&lt;</span> <span style="color: #40A070">0</span> <span style="color: #007020; font-weight: bold">or</span> local_loss <span style="color: #666">!=</span> local_loss:
+        <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">False</span>, <span style="color: #4070A0">f"local_loss debe ser numérico finito &gt;= 0, recibido: </span><span style="color: #70A0D0; font-style: italic">{</span>local_loss<span style="color: #70A0D0; font-style: italic">}</span><span style="color: #4070A0">"</span>
+
+    <span style="color: #007020; font-weight: bold">return</span> <span style="color: #007020; font-weight: bold">True</span>, <span style="color: #007020; font-weight: bold">None</span>
+</pre></div>
+</div>
+<hr />
+<h2>4. Resultados Experimentales y Mediciones</h2>
+<p>Las pruebas se ejecutaron mediante la suite automatizada del taller (<code>workshop7_server.py</code> y <code>workshop7_client.py</code>). A continuación se detallan las evidencias capturadas en consola y las mediciones cuantitativas.</p>
+<h3>4.1. Registro de Ejecución del Cliente (Terminal / Consola)</h3>
+
+            <div style="background: #0f172a; border-radius: 6px; padding: 12px 16px; margin: 14px 0; border: 1px solid #1e293b; page-break-inside: avoid;">
+              <div style="color: #64748b; font-size: 8pt; margin-bottom: 6px; text-transform: uppercase; font-family: monospace; letter-spacing: 0.5px;">Terminal Output</div>
+              <pre style="margin: 0; font-family: 'Cascadia Code', Consolas, monospace; font-size: 8.5pt; color: #38bdf8; line-height: 1.45; overflow-x: auto;">================================================================================
+CLIENTE DISTRIBUIDO - WORKSHOP 7: INTERCAMBIO JSON Y XML
+Conectando a Servidor Coordinador en: 127.0.0.1:5990
+Identificador del Cliente: client_1
+================================================================================
+
+################################################################################
+ACTIVIDAD 1: Servicio CON Esquemas Predefinidos ('get_global_model')
+Esquemas: schemas/request.schema.json, response.schema.json, message.xsd
+################################################################################
+
+[Paso 1.1] Transmisión en formato JSON:
+  * Solicitud enviada: {'client_id': 'client_1', 'service': 'get_global_model', 'round': 1, 'format': 'json'}
+  * Validación previa solicitud (JSON Schema): VÁLIDA (PASS)
+  * Respuesta recibida: {'status': 'success', 'round': 1, 'model_version': 1, 'message': 'Modelo global ronda 1 entregado con éxito a client_1', 'client_id': 'client_1'}
+  * Validación respuesta (Response Schema): VÁLIDA (PASS)
+  * Bytes: Solicitud=86 B | Respuesta=146 B | Total=232 B
+  * Latencia RTT: 4.339 ms
+  * Sobrecarga procesamiento: Ser=0.031 ms | ValReq=0.638 ms | Deser=0.021 ms | ValResp=0.536 ms | Total=1.226 ms
+
+[Paso 1.2] Transmisión en formato XML:
+  * Solicitud enviada: {'client_id': 'client_1', 'service': 'get_global_model', 'round': 1, 'format': 'xml'}
+  * Validación previa solicitud (XML XSD): VÁLIDA (PASS)
+  * Respuesta recibida: {'status': 'success', 'round': 1, 'model_version': 1, 'message': 'Modelo global ronda 1 entregado con éxito a client_1', 'client_id': 'client_1'}
+  * Validación respuesta (XML XSD): VÁLIDA (PASS)
+  * Bytes: Solicitud=160 B | Respuesta=235 B | Total=395 B
+  * Latencia RTT: 0.861 ms
+  * Sobrecarga procesamiento: Ser=0.123 ms | ValReq=0.074 ms | Deser=0.096 ms | ValResp=0.414 ms | Total=0.708 ms
+
+[Paso 1.3] Caso de Control Negativo (Payload corrupto violando esquema):
+  * Enviando solicitud deliberadamente inválida: {'client_id': 'nodo_no_autorizado_99', 'service': 'get_global_model', 'round': -5, 'format': 'json'}
+  * Detección local por JSON Schema: DETECTADO (OK): -5 is less than the minimum of 0
+  * Respuesta del servidor ante payload corrupto: {'status': 'error', 'round': -5, 'message': 'Esquema inválido: -5 is less than the minimum of 0', 'client_id': 'nodo_no_autorizado_99'}
+  -&gt; Rechazo verificado correctamente por el Servidor.
+
+################################################################################
+ACTIVIDAD 2: Servicio SIN Esquemas Predefinidos ('training_report')
+Validación: Reglas semánticas programáticas en código de aplicación
+################################################################################
+
+[Paso 2.1] Reporte de entrenamiento válido:
+  * Solicitud enviada: {'client_id': 'client_1', 'service': 'training_report', 'round': 1, 'samples': 3450, 'local_loss': 0.0385, 'format': 'json'}
+  * Validación en código (Reglas semánticas): APROBADA (PASS)
+  * Respuesta recibida del servidor: {'status': 'received', 'round': 1, 'message': 'Reporte de entrenamiento de client_1 (Ronda 1) persistido correctamente', 'client_id': 'client_1'}
+  * Bytes: Solicitud=124 B | Respuesta=145 B | Total=269 B
+  * Latencia RTT: 0.379 ms
+  * Sobrecarga procesamiento: Ser=0.015 ms | ValCódigo=0.005 ms | Deser=0.012 ms | Total=0.033 ms
+
+[Paso 2.2] Caso de Control Negativo (Regla semántica violada: samples &lt;= 0):
+  * Enviando reporte con muestras negativas: {'client_id': 'client_1', 'service': 'training_report', 'round': 1, 'samples': -450, 'local_loss': 0.0385, 'format': 'json'}
+  * Detección por validador programático: DETECTADO (OK): samples debe ser un entero &gt; 0, valor recibido: -450
+  * Respuesta del servidor: {'status': 'error', 'round': 1, 'message': 'Validación programática falló: samples debe ser un entero &gt; 0, valor recibido: -450', 'client_id': 'client_1'}
+  -&gt; Rechazo semántico verificado con éxito por el Servidor.
+</pre>
+            </div>
+            
+<hr />
+<h3>4.2. Tabla Consolidada de Mediciones Experimentales</h3>
+<table>
+<thead>
+<tr>
+<th>Actividad</th>
+<th>Servicio</th>
+<th style="text-align:center">Formato</th>
+<th style="text-align:center">Bytes Solicitud</th>
+<th style="text-align:center">Bytes Respuesta</th>
+<th style="text-align:center">Bytes Totales</th>
+<th style="text-align:center">Latencia RTT (ms)</th>
+<th style="text-align:center">Serialización (ms)</th>
+<th style="text-align:center">Validación Req (ms)</th>
+<th style="text-align:center">Deserialización (ms)</th>
+<th style="text-align:center">Sobrecarga Total (ms)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Actividad 1 (Con Schema)</strong></td>
+<td><code>get_global_model</code></td>
+<td style="text-align:center"><strong>JSON</strong></td>
+<td style="text-align:center">86 B</td>
+<td style="text-align:center">146 B</td>
+<td style="text-align:center"><strong>232 B</strong></td>
+<td style="text-align:center">4.339 ms</td>
+<td style="text-align:center">0.031 ms</td>
+<td style="text-align:center">0.638 ms</td>
+<td style="text-align:center">0.021 ms</td>
+<td style="text-align:center"><strong>1.226 ms</strong></td>
+</tr>
+<tr>
+<td><strong>Actividad 1 (Con Schema)</strong></td>
+<td><code>get_global_model</code></td>
+<td style="text-align:center"><strong>XML</strong></td>
+<td style="text-align:center">160 B</td>
+<td style="text-align:center">235 B</td>
+<td style="text-align:center"><strong>395 B</strong></td>
+<td style="text-align:center">0.861 ms</td>
+<td style="text-align:center">0.124 ms</td>
+<td style="text-align:center">0.074 ms</td>
+<td style="text-align:center">0.096 ms</td>
+<td style="text-align:center"><strong>0.708 ms</strong></td>
+</tr>
+<tr>
+<td><strong>Actividad 2 (Sin Schema / Código)</strong></td>
+<td><code>training_report</code></td>
+<td style="text-align:center"><strong>JSON</strong></td>
+<td style="text-align:center">124 B</td>
+<td style="text-align:center">145 B</td>
+<td style="text-align:center"><strong>269 B</strong></td>
+<td style="text-align:center">0.379 ms</td>
+<td style="text-align:center">0.015 ms</td>
+<td style="text-align:center">0.005 ms</td>
+<td style="text-align:center">0.012 ms</td>
+<td style="text-align:center"><strong>0.033 ms</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>5. Discusión y Análisis Comparativo</h2>
+<h3>5.1. Comparación de Eficiencia de Datos: JSON vs. XML</h3>
+<ul>
+<li><strong>Tamaño de Solicitud:</strong> En la Actividad 1, la solicitud JSON consumió <strong>86 bytes</strong>, mientras que la versión equivalente en XML requirió <strong>160 bytes</strong>, lo que representa un incremento del <strong>+86.05%</strong> en XML.</li>
+<li><strong>Tamaño de Respuesta:</strong> La respuesta JSON requirió <strong>146 bytes</strong> frente a <strong>235 bytes</strong> en XML (<strong>+60.96%</strong> más en XML).</li>
+<li><strong>Causa Estructural:</strong> XML es intrínsecamente más verboso debido a la necesidad de etiquetas de apertura y cierre explícitas (<code>&lt;client_id&gt;client_1&lt;/client_id&gt;</code> vs. <code>&quot;client_id&quot;:&quot;client_1&quot;</code>), además del prólogo XML (<code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</code>). En sistemas distribuidos con miles de transacciones por segundo o clientes conectados por enlaces IoT limitados (como el nodo Raspberry Pi), JSON ofrece un ahorro considerable de ancho de banda.</li>
+</ul>
+<h3>5.2. Comparación de Sobrecarga de Serialización y Deserialización</h3>
+<ul>
+<li><strong>Serialización:</strong> La serialización a JSON tomó <strong>0.031 ms</strong> frente a <strong>0.124 ms</strong> en XML (~4 veces más rápido en JSON).</li>
+<li><strong>Deserialización:</strong> La deserialización de JSON tardó <strong>0.021 ms</strong> frente a <strong>0.096 ms</strong> en XML (~4.5 veces más rápido en JSON).</li>
+<li><strong>Causa:</strong> El motor <code>json</code> de Python está implementado en C puro y realiza mapeo directo a diccionarios. El parser XML (<code>xml.etree</code> / <code>lxml</code>) debe construir el árbol DOM de elementos y navegar nodos antes de extraer valores tipados.</li>
+</ul>
+<h3>5.3. Comparación de Validación: Esquema Formal vs. Validación en Código</h3>
+<ul>
+<li><strong>Validación con JSON Schema:</strong> Tomó <strong>0.638 ms</strong>, ya que la librería <code>jsonschema</code> en Python evalúa reglas complejas del metamodelo recursivamente en memoria.</li>
+<li><strong>Validación con XML XSD:</strong> Tomó <strong>0.074 ms</strong>, beneficiándose de que el validador XSD de <code>lxml</code> compila el esquema contra la biblioteca nativa en C <code>libxml2</code>.</li>
+<li><strong>Validación Programática en Código (Actividad 2):</strong> Tomó apenas <strong>0.005 ms</strong>.
+<ul>
+<li><strong>Ventaja de la validación en código:</strong> Es extraordinariamente rápida (más de <strong>100 veces más veloz</strong> que la validación basada en esquemas genéricos en Python), consume memoria despreciable y permite validar relaciones dinámicas o cálculos entre campos que los esquemas declarativos estáticos no pueden expresar fácilmente.</li>
+<li><strong>Desventaja de la validación en código:</strong> Acopla estrechamente al cliente y al servidor en una tecnología o lenguaje específico, carece de un contrato formal legible por humanos o herramientas de autogeneración de SDKs, y traslada toda la responsabilidad del control de errores al programador.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2>6. Conclusiones</h2>
+<ol>
+<li><strong>Cumplimiento del Taller:</strong> Se implementó con éxito la comunicación cliente-servidor distribuida para dos componentes físicos mediante sockets TCP con delimitación de tramas de 4 bytes, abordando tanto la validación estricta por esquemas predefinidos (JSON Schema y XSD) como la validación programática en código.</li>
+<li><strong>Robustez ante Errores:</strong> Tanto en la Actividad 1 como en la Actividad 2, los mecanismos de validación rechazaron de forma inmediata las solicitudes corruptas (e.g., valores negativos en campos restringidos o identificadores fuera de catálogo), evitando estados inconsistentes en el servidor.</li>
+<li><strong>Decisión de Diseño para el Proyecto:</strong> Para el proyecto final <em>AIR_QUALITY_DISTRIBUTED</em>, el formato <strong>JSON</strong> resulta superior para la transmisión periódica de pesos y deltas de red neuronal gracias a su menor huella de bytes y su baja latencia de serialización, mientras que los contratos <strong>JSON Schema</strong> garantizan una interfaz formal y segura entre nodos heterogéneos.</li>
+</ol>
+<hr />
+<h2>7. Instrucciones para Ejecutar entre Dos Máquinas</h2>
+<p>Para replicar este taller en dos máquinas físicas conectadas a la misma red:</p>
+<h3>En la Máquina 1 (Servidor Coordinador):</h3>
+<div style="margin: 12px 0; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0; page-break-inside: avoid;"><div class="highlight" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><span style="color: #60A0B0; font-style: italic"># Conocer la IP local (por ejemplo 192.168.1.50)</span>
+python<span style="color: #BBB"> </span>workshop7_server.py<span style="color: #BBB"> </span>--host<span style="color: #BBB"> </span><span style="color: #40A070">0</span>.0.0.0<span style="color: #BBB"> </span>--port<span style="color: #BBB"> </span><span style="color: #40A070">5000</span>
+</pre></div>
+</div>
+<h3>En la Máquina 2 (Cliente PC o Raspberry Pi):</h3>
+<div style="margin: 12px 0; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0; page-break-inside: avoid;"><div class="highlight" style="background: #f0f0f0"><pre style="line-height: 125%;"><span></span><span style="color: #60A0B0; font-style: italic"># Reemplazar con la IP del Servidor Coordinador</span>
+python<span style="color: #BBB"> </span>workshop7_client.py<span style="color: #BBB"> </span>--server-host<span style="color: #BBB"> </span><span style="color: #40A070">192</span>.168.1.50<span style="color: #BBB"> </span>--port<span style="color: #BBB"> </span><span style="color: #40A070">5000</span><span style="color: #BBB"> </span>--client-id<span style="color: #BBB"> </span>client_1
+</pre></div>
+</div>
+
+</body>
+</html>

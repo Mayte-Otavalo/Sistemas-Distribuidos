@@ -1,0 +1,4 @@
+Actividad,Servicio,Formato,Bytes Solicitud,Bytes Respuesta,Bytes Total,RTT Latencia (ms),Serialización (ms),Validación Req (ms),Deserialización (ms),Overhead Total (ms)
+Actividad 1 (JSON con Schema),get_global_model,JSON,86,146,232,10.238,0.0432,1.5577,0.0258,2.2913
+Actividad 1 (XML con XSD),get_global_model,XML,160,235,395,2.572,0.2288,0.1249,0.2271,0.9944
+Actividad 2 (Sin Schema / Código),training_report,JSON,124,145,269,1.888,0.0393,0.0136,0.0274,0.0827

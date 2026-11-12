@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RequestSchema",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "enum": ["client_1", "client_2"]
+    },
+    "service": {
+      "type": "string",
+      "enum": ["get_global_model", "ping", "disconnect"]
+    },
+    "round": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "format": {
+      "type": "string",
+      "enum": ["json", "xml"]
+    }
+  },
+  "required": ["client_id", "service", "round", "format"],
+  "additionalProperties": true
+}

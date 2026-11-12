@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¿Cómo funciona un Sistema Distribuido? - Animación Interactiva</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --accent-blue: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-purple: #c084fc;
+      --accent-amber: #fbbf24;
+      --accent-red: #f87171;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    header {
+      text-align: center;
+      max-width: 900px;
+      margin-bottom: 25px;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 25px;
+      background: #1e293b;
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+      background: #3b82f6;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .tab-content {
+      display: none;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CARD STYLES */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    /* GENERAL CONCEPT SECTION */
+    .analogy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .analogy-grid { grid-template-columns: 1fr; }
+    }
+
+    .analogy-box {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #334155;
+      position: relative;
+    }
+
+    .analogy-box.bad {
+      border-top: 4px solid var(--accent-red);
+    }
+
+    .analogy-box.good {
+      border-top: 4px solid var(--accent-green);
+    }
+
+    .analogy-box h3 {
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* CONCRETE SIMULATION STAGE */
+    .simulation-container {
+      position: relative;
+      background: #0b1120;
+      border: 2px solid #1e293b;
+      border-radius: 20px;
+      height: 440px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    /* NODES */
+    .network-node {
+      position: absolute;
+      width: 220px;
+      background: #1e293b;
+      border: 2px solid #3b82f6;
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      z-index: 10;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .network-node:hover {
+      transform: scale(1.03);
+    }
+
+    .node-icon {
+      font-size: 2.2rem;
+      margin-bottom: 6px;
+    }
+
+    .node-title {
+      font-weight: bold;
+      font-size: 1rem;
+      color: var(--accent-blue);
+    }
+
+    .node-role {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .node-status {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: rgba(74, 222, 128, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+    }
+
+    /* POSITIONS OF THE 3 REAL NODES */
+    #node-server {
+      top: 35px;
+      left: calc(50% - 110px);
+      border-color: #818cf8;
+    }
+    #node-server .node-title { color: #818cf8; }
+
+    #node-client1 {
+      bottom: 35px;
+      left: 10%;
+      border-color: #38bdf8;
+    }
+
+    #node-client2 {
+      bottom: 35px;
+      right: 10%;
+      border-color: #fb7185;
+    }
+    #node-client2 .node-title { color: #fb7185; }
+
+    /* SVG NETWORK LINES */
+    #network-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .network-wire {
+      stroke: #334155;
+      stroke-width: 4;
+      stroke-dasharray: 8 6;
+      animation: wirePulse 30s linear infinite;
+    }
+
+    .network-wire.active {
+      stroke: #38bdf8;
+      stroke-width: 5;
+    }
+
+    @keyframes wirePulse {
+      to { stroke-dashoffset: -1000; }
+    }
+
+    /* FLYING PACKET */
+    .data-packet {
+      position: absolute;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      z-index: 30;
+      pointer-events: auto;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      transition: box-shadow 0.2s;
+    }
+
+    .data-packet:hover {
+      box-shadow: 0 0 15px #fff;
+    }
+
+    .packet-json {
+      background: #0284c7;
+      color: #fff;
+      border: 1px solid #38bdf8;
+    }
+
+    .packet-xml {
+      background: #ea580c;
+      color: #fff;
+      border: 1px solid #fb923c;
+    }
+
+    .packet-corrupt {
+      background: #dc2626;
+      color: #fff;
+      border: 1px solid #f87171;
+      animation: shake 0.5s infinite alternate;
+    }
+
+    @keyframes shake {
+      from { transform: translate(-50%, -50%) rotate(-4deg); }
+      to { transform: translate(-50%, -50%) rotate(4deg); }
+    }
+
+    /* CONTROLS BAR */
+    .controls-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      background: #1e293b;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: #ffffff;
+    }
+    .btn-primary:hover { background: #2563eb; }
+
+    .btn-json {
+      background: #0284c7;
+      color: #ffffff;
+    }
+    .btn-json:hover { background: #0369a1; }
+
+    .btn-xml {
+      background: #ea580c;
+      color: #ffffff;
+    }
+    .btn-xml:hover { background: #c2410c; }
+
+    .btn-error {
+      background: #dc2626;
+      color: #ffffff;
+    }
+    .btn-error:hover { background: #b91c1c; }
+
+    .btn-reset {
+      background: #475569;
+      color: #f8fafc;
+    }
+    .btn-reset:hover { background: #334155; }
+
+    /* EXPLANATION BOX (THE STORYTELLER) */
+    .story-banner {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+      border: 1px solid #3b82f6;
+      border-left: 6px solid #38bdf8;
+      border-radius: 12px;
+      padding: 18px 24px;
+      margin-bottom: 20px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .story-icon {
+      font-size: 2.2rem;
+      flex-shrink: 0;
+    }
+
+    .story-text h4 {
+      color: var(--accent-blue);
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .story-text p {
+      color: var(--text-main);
+      font-size: 0.96rem;
+      line-height: 1.5;
+    }
+
+    /* INSPECTOR MODAL / DRAWER */
+    .inspector-card {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 15px;
+    }
+
+    .info-tile {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .info-tile h5 {
+      color: var(--accent-amber);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-tile pre {
+      background: #090d16;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      color: #a5f3fc;
+      overflow-x: auto;
+    }
+
+    /* SIMPLE COMPARISON TABLE */
+    .simple-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 0.95rem;
+    }
+
+    .simple-table th, .simple-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+
+    .simple-table th {
+      background: #0f172a;
+      color: var(--accent-blue);
+    }
+
+    .badge-check {
+      background: rgba(74, 222, 128, 0.2);
+      color: var(--accent-green);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
+    .badge-cross {
+      background: rgba(248, 113, 113, 0.2);
+      color: var(--accent-red);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>¿Cómo Funciona un Sistema Distribuido?</h1>
+    <p>Una guía interactiva y visual para entender cómo múltiples computadoras colaboran sin compartir sus datos privados.</p>
+  </header>
+
+  <!-- PESTAÑAS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('concept')">💡 1. Para Todo Público (La Idea General)</button>
+    <button class="tab-btn" onclick="switchTab('simulation')">🚀 2. En Tu Proyecto Real (Simulación Animada)</button>
+    <button class="tab-btn" onclick="switchTab('comparison')">⚖️ 3. JSON vs XML (La Aduana)</button>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAB 1: CONCEPTO GENERAL (PARA NO TÉCNICOS) -->
+  <!-- ========================================== -->
+  <div id="tab-concept" class="tab-content active">
+    <div class="card">
+      <h2>🍕 La Analogía de la Receta Secreta de Pizza</h2>
+      <p style="margin-top: 10px; color: var(--text-muted); line-height: 1.6;">
+        Imagina que quieres crear la <strong>mejor receta de pizza de la ciudad</strong>. Tienes dos formas de resolverlo:
+      </p>
+
+      <div class="analogy-grid">
+        <!-- Monolito / Centralizado -->
+        <div class="analogy-box bad">
+          <h3>❌ La Forma Antigua (Centralizada)</h3>
+          <p>
+            Obligas a todas las pizzerías de cada barrio a <strong>enviar todos sus ingredientes, recetas secretas y fotos de sus clientes</strong> a un solo camión gigante en el centro de la ciudad.
+          </p>
+          <ul style="margin: 14px 0 0 20px; color: #cbd5e1; line-height: 1.6;">
+            <li><strong>Peligro:</strong> Si ese camión central se descompone, <em>toda la ciudad se queda sin pizzas</em>.</li>
+            <li><strong>Sin privacidad:</strong> Las pizzerías locales pierden el control sobre sus datos y secretos.</li>
+            <li><strong>Tráfico pesado:</strong> Mover toneladas de harina por la calle satura la ciudad.</li>
+          </ul>
+        </div>
+
+        <!-- Distribuido -->
+        <div class="analogy-box good">
+          <h3>✅ La Forma Distribuida (Tu Proyecto)</h3>
+          <p>
+            Cada pizzería se queda en su cocina. Ningún ingrediente secreto sale de su local. Cada chef hornea con sus propios hornos y <strong>solo comparten consejos breves por teléfono</strong>:
+          </p>
+          <ul style="margin: 14px 0 0 20px; color: #cbd5e1; line-height: 1.6;">
+            <li><em>"Chef de barrio norte: Yo le agregué 2 gramos de orégano y mejoró un 5%"</em>.</li>
+            <li>El coordinador central junta todos los consejos y les devuelve la versión mejorada.</li>
+            <li><strong>Privacidad total</strong> y si una pizzería cierra, las demás siguen funcionando.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="margin-top: 25px; padding: 18px; background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; border-radius: 8px;">
+        <h4 style="color: #38bdf8; margin-bottom: 6px;">En palabras sencillas:</h4>
+        <p style="color: #e2e8f0; line-height: 1.6;">
+          Un <strong>Sistema Distribuido</strong> es como un equipo de trabajo donde cada persona tiene su propia libreta, piensa en su propia mesa y solo se comunican por mensajería para ponerse de acuerdo. Para el usuario final, parece un solo supercerebro, pero detrás hay varias máquinas ayudándose.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAB 2: SIMULACIÓN INTERACTIVA DEL PROYECTO -->
+  <!-- ========================================== -->
+  <div id="tab-simulation" class="tab-content">
+    
+    <!-- EXPLICADOR EN VIVO -->
+    <div class="story-banner">
+      <div class="story-icon" id="story-icon">🤖</div>
+      <div class="story-text">
+        <h4 id="story-title">Listo para empezar</h4>
+        <p id="story-desc">Elige un tipo de prueba abajo para ver cómo viajan los mensajes entre tu Servidor Coordinador y los Clientes (PC y Raspberry Pi).</p>
+      </div>
+    </div>
+
+    <!-- BOTONES DE CONTROL -->
+    <div class="controls-panel">
+      <button class="btn btn-primary" onclick="startSequence('full')">▶️ Demostración Completa</button>
+      <button class="btn btn-json" onclick="startSequence('json')">📄 Enviar Solicitud JSON (Rápida)</button>
+      <button class="btn btn-xml" onclick="startSequence('xml')">📜 Enviar Solicitud XML (Formal)</button>
+      <button class="btn btn-error" onclick="startSequence('error')">🚨 Simular Trampa (Datos Corruptos)</button>
+      <button class="btn btn-reset" onclick="resetCanvas()">🔄 Reiniciar</button>
+    </div>
+
+    <!-- ESCENARIO DE SIMULACIÓN -->
+    <div class="simulation-container" id="sim-stage">
+      
+      <!-- CABLES DE RED (SVG) -->
+      <svg id="network-svg">
+        <line id="wire-c1" x1="20%" y1="75%" x2="50%" y2="25%" class="network-wire" />
+        <line id="wire-c2" x1="80%" y1="75%" x2="50%" y2="25%" class="network-wire" />
+      </svg>
+
+      <!-- NODO 0: SERVIDOR COORDINADOR -->
+      <div class="network-node" id="node-server">
+        <div class="node-icon">🧠 🖥️</div>
+        <div class="node-title">Nodo 0: Coordinador</div>
+        <div class="node-role">Servidor Central (PC 1)</div>
+        <div class="node-status" id="server-status">Esperando conexiones</div>
+      </div>
+
+      <!-- NODO 1: CLIENTE 1 (PC) -->
+      <div class="network-node" id="node-client1">
+        <div class="node-icon">💻</div>
+        <div class="node-title">Nodo 1: Cliente 1</div>
+        <div class="node-role">Computadora Portátil</div>
+        <div class="node-status" id="client1-status">Datos de Aire: Zona 1</div>
+      </div>
+
+      <!-- NODO 2: CLIENTE 2 (RASPBERRY PI) -->
+      <div class="network-node" id="node-client2">
+        <div class="node-icon">🍓</div>
+        <div class="node-title">Nodo 2: Cliente 2</div>
+        <div class="node-role">Raspberry Pi (Dispositivo Pequeño)</div>
+        <div class="node-status" id="client2-status">Datos de Aire: Zona 2</div>
+      </div>
+
+      <!-- PAQUETE FLOTANTE VIAJERO -->
+      <div id="flying-packet" class="data-packet packet-json" style="display: none;" onclick="inspectCurrentPacket()">
+        <span id="packet-icon">📦</span>
+        <span id="packet-label">get_global_model</span>
+      </div>
+
+    </div>
+
+    <!-- INSPECTOR DE PAQUETES (QUÉ VIAJA POR EL CABLE) -->
+    <div class="card">
+      <h3 style="margin-bottom: 12px; display:flex; align-items:center; gap:8px;">
+        🔍 Radiografía de lo que viaja por el cable de red
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
+        A diferencia de enviar un archivo pesado de Excel o miles de fotos, en tu sistema distribuido sólo viajan mensajes compactos de control:
+      </p>
+
+      <div class="inspector-card">
+        <div class="info-tile">
+          <h5>1. En formato JSON (Ágil y moderno)</h5>
+          <pre>{
+  "client_id": "client_1",
+  "service": "get_global_model",
+  "round": 1,
+  "format": "json"
+}</pre>
+          <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 6px;">Tamaño minúsculo: ~85 bytes. Ideal para conexiones móviles o rápidas.</p>
+        </div>
+
+        <div class="info-tile">
+          <h5>2. En formato XML (Estricto y tradicional)</h5>
+          <pre>&lt;request&gt;
+  &lt;client_id&gt;client_2&lt;/client_id&gt;
+  &lt;service&gt;get_global_model&lt;/service&gt;
+  &lt;round&gt;1&lt;/round&gt;
+&lt;/request&gt;</pre>
+          <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 6px;">Tamaño: ~180 bytes. Lleva etiquetas dobles, mayor rigor documental.</p>
+        </div>
+
+        <div class="info-tile">
+          <h5>3. La "Aduana" (Validación estricta)</h5>
+          <div style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.4;">
+            Antes de que el servidor acepte un reporte, un policía digital verifica:
+            <br>• ¿El número de muestras es negativo? ➡️ <strong>¡Rechazado!</strong>
+            <br>• ¿Falta la firma del cliente? ➡️ <strong>¡Rechazado!</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAB 3: COMPARACIÓN JSON VS XML Y ADUANA    -->
+  <!-- ========================================== -->
+  <div id="tab-comparison" class="tab-content">
+    <div class="card">
+      <h2>⚖️ Comparativa: ¿Por qué probaron JSON y XML?</h2>
+      <p style="color: var(--text-muted); margin-top: 8px;">
+        En tu Workshop 7 compararon ambos lenguajes para ver cuál gasta menos internet y cuál tarda menos tiempo en procesarse:
+      </p>
+
+      <table class="simple-table">
+        <thead>
+          <tr>
+            <th>Aspecto</th>
+            <th>JSON (Formato Ligero)</th>
+            <th>XML (Formato Formal)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>¿Cómo se ve?</strong></td>
+            <td>Como una lista de compras rápida con llaves <code>{ }</code></td>
+            <td>Como un documento formal con sellos y etiquetas <code>&lt;etiqueta&gt;</code></td>
+          </tr>
+          <tr>
+            <td><strong>Gasto de datos (Bytes)</strong></td>
+            <td><span class="badge-check">Muy bajo (~50% más liviano)</span></td>
+            <td>Mayor peso por tantas etiquetas repetidas</td>
+          </tr>
+          <tr>
+            <td><strong>Velocidad de procesamiento</strong></td>
+            <td><span class="badge-check">Ultrarrápido en PC y Raspberry Pi</span></td>
+            <td>Más lento porque requiere procesar árboles XML y XSD</td>
+          </tr>
+          <tr>
+            <td><strong>¿Quién vigila las reglas?</strong></td>
+            <td><strong>JSON Schema:</strong> Verifica tipos de datos básicos</td>
+            <td><strong>XSD:</strong> Gramática corporativa muy formal y estricta</td>
+          </tr>
+          <tr>
+            <td><strong>¿Y las reglas lógicas?</strong></td>
+            <td colspan="2" style="text-align: center; color: var(--accent-amber);">
+              <strong>Validación en Código:</strong> Por ejemplo, verificar que las muestras de aire no sean negativas (<code>samples &gt; 0</code>).
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 25px; background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #334155;">
+        <h3 style="color: var(--accent-green); margin-bottom: 8px;">🎯 ¿Qué demostró tu proyecto en conclusión?</h3>
+        <p style="color: #cbd5e1; line-height: 1.6;">
+          Demostró que en un sistema real (especialmente con dispositivos pequeños como la <strong>Raspberry Pi</strong>), 
+          <strong>JSON es mucho más eficiente</strong> porque ahorra batería, consume menos red y procesa más rápido, mientras que la <strong>validación de esquemas y código</strong> asegura que ningún cliente pueda sabotear el modelo con datos falsos o corruptos.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT DE ANIMACIÓN E INTERACCIÓN -->
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      if (tabId === 'concept') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tab-concept').classList.add('active');
+      } else if (tabId === 'simulation') {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tab-simulation').classList.add('active');
+        updateWireCoordinates();
+      } else {
+        document.querySelectorAll('.tab-btn')[2].classList.add('active');
+        document.getElementById('tab-comparison').classList.add('active');
+      }
+    }
+
+    // Actualizar coordenadas de las líneas de red en SVG según la pantalla
+    function updateWireCoordinates() {
+      const stage = document.getElementById('sim-stage');
+      const srv = document.getElementById('node-server');
+      const c1 = document.getElementById('node-client1');
+      const c2 = document.getElementById('node-client2');
+
+      if (!stage || !srv || !c1 || !c2) return;
+
+      const stageRect = stage.getBoundingClientRect();
+      const srvRect = srv.getBoundingClientRect();
+      const c1Rect = c1.getBoundingClientRect();
+      const c2Rect = c2.getBoundingClientRect();
+
+      const srvX = (srvRect.left + srvRect.width / 2) - stageRect.left;
+      const srvY = (srvRect.top + srvRect.height / 2) - stageRect.top;
+
+      const c1X = (c1Rect.left + c1Rect.width / 2) - stageRect.left;
+      const c1Y = (c1Rect.top + c1Rect.height / 2) - stageRect.top;
+
+      const c2X = (c2Rect.left + c2Rect.width / 2) - stageRect.left;
+      const c2Y = (c2Rect.top + c2Rect.height / 2) - stageRect.top;
+
+      const wire1 = document.getElementById('wire-c1');
+      const wire2 = document.getElementById('wire-c2');
+
+      wire1.setAttribute('x1', c1X);
+      wire1.setAttribute('y1', c1Y);
+      wire1.setAttribute('x2', srvX);
+      wire1.setAttribute('y2', srvY);
+
+      wire2.setAttribute('x1', c2X);
+      wire2.setAttribute('y1', c2Y);
+      wire2.setAttribute('x2', srvX);
+      wire2.setAttribute('y2', srvY);
+    }
+
+    window.addEventListener('resize', updateWireCoordinates);
+
+    // Sistema de Animación de Paquetes
+    let animTimer = null;
+
+    function setStory(icon, title, desc) {
+      document.getElementById('story-icon').textContent = icon;
+      document.getElementById('story-title').textContent = title;
+      document.getElementById('story-desc').textContent = desc;
+    }
+
+    function resetCanvas() {
+      if (animTimer) clearTimeout(animTimer);
+      const packet = document.getElementById('flying-packet');
+      packet.style.display = 'none';
+      packet.className = 'data-packet packet-json';
+
+      document.getElementById('server-status').textContent = 'Esperando conexiones';
+      document.getElementById('server-status').style.color = '#4ade80';
+      document.getElementById('client1-status').textContent = 'Datos de Aire: Zona 1';
+      document.getElementById('client2-status').textContent = 'Datos de Aire: Zona 2';
+
+      document.getElementById('wire-c1').classList.remove('active');
+      document.getElementById('wire-c2').classList.remove('active');
+
+      setStory('🤖', 'Listo para empezar', 'Elige cualquier botón arriba para simular una interacción.');
+    }
+
+    function animatePacket(fromEl, toEl, className, label, icon, onComplete) {
+      updateWireCoordinates();
+      const stage = document.getElementById('sim-stage');
+      const stageRect = stage.getBoundingClientRect();
+      const startRect = fromEl.getBoundingClientRect();
+      const endRect = toEl.getBoundingClientRect();
+
+      const startX = (startRect.left + startRect.width / 2) - stageRect.left;
+      const startY = (startRect.top + startRect.height / 2) - stageRect.top;
+
+      const endX = (endRect.left + endRect.width / 2) - stageRect.left;
+      const endY = (endRect.top + endRect.height / 2) - stageRect.top;
+
+      const packet = document.getElementById('flying-packet');
+      packet.className = 'data-packet ' + className;
+      document.getElementById('packet-label').textContent = label;
+      document.getElementById('packet-icon').textContent = icon;
+      packet.style.display = 'flex';
+
+      const duration = 1600;
+      const startTime = performance.now();
+
+      function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1.0);
+
+        // Curva suave
+        const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+
+        const currentX = startX + (endX - startX) * ease;
+        const currentY = startY + (endY - startY) * ease;
+
+        packet.style.left = currentX + 'px';
+        packet.style.top = currentY + 'px';
+
+        if (progress < 1.0) {
+          requestAnimationFrame(step);
+        } else {
+          packet.style.display = 'none';
+          if (onComplete) onComplete();
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    function startSequence(type) {
+      resetCanvas();
+      const srv = document.getElementById('node-server');
+      const c1 = document.getElementById('node-client1');
+      const c2 = document.getElementById('node-client2');
+
+      if (type === 'json') {
+        // Enviar JSON desde Cliente 1 a Servidor
+        setStory('📨', 'Paso 1: Solicitud en formato JSON', 'El Cliente 1 (PC) le pide al Coordinador el modelo actual usando un mensaje JSON ultraligero (85 bytes).');
+        document.getElementById('wire-c1').classList.add('active');
+
+        animatePacket(c1, srv, 'packet-json', 'JSON: get_global_model', '📄', () => {
+          document.getElementById('server-status').textContent = 'Validando JSON Schema...';
+          setStory('🔍', 'Paso 2: Validación en el Servidor', 'El Coordinador revisa el JSON con el "JSON Schema". ¡Estructura perfecta! Procede a responder.');
+          
+          setTimeout(() => {
+            document.getElementById('server-status').textContent = 'Enviando modelo...';
+            setStory('🚀', 'Paso 3: Respuesta Entregada', 'El Coordinador devuelve el modelo matemático al Cliente 1.');
+            
+            animatePacket(srv, c1, 'packet-json', 'JSON: Modelo Entregado', '✅', () => {
+              document.getElementById('client1-status').textContent = 'Modelo actualizado';
+              setStory('🎉', '¡Completado con Éxito!', 'Tiempo total: menos de 2 milisegundos. Datos transmitidos mínimos y validados.');
+            });
+          }, 1200);
+        });
+
+      } else if (type === 'xml') {
+        // Enviar XML desde Cliente 2 (Raspberry Pi) a Servidor
+        setStory('📜', 'Paso 1: Solicitud en formato XML', 'El Cliente 2 (Raspberry Pi) envía una petición envuelta en etiquetas XML formales y estrictas.');
+        document.getElementById('wire-c2').classList.add('active');
+
+        animatePacket(c2, srv, 'packet-xml', 'XML: get_global_model', '📜', () => {
+          document.getElementById('server-status').textContent = 'Validando XML con XSD...';
+          setStory('🧐', 'Paso 2: Inspección XSD', 'El Servidor pasa el XML por el validador XSD para confirmar que todas las etiquetas abren y cierran según el estándar.');
+
+          setTimeout(() => {
+            document.getElementById('server-status').textContent = 'Respondiendo XML...';
+            setStory('📤', 'Paso 3: Envío de Respuesta XML', 'El Servidor empaqueta la respuesta en XML y la envía de vuelta a la Raspberry Pi.');
+
+            animatePacket(srv, c2, 'packet-xml', 'XML: Modelo Recibido', '✅', () => {
+              document.getElementById('client2-status').textContent = 'Modelo recibido (XML)';
+              setStory('📊', 'Resultado XML', 'Funcionó con éxito, aunque requirió el doble de bytes y más tiempo de CPU en la Raspberry Pi que el JSON.');
+            });
+          }, 1400);
+        });
+
+      } else if (type === 'error') {
+        // Enviar mensaje tramposo / corrupto
+        setStory('🚨', 'Simulación de Rechazo (Aduana Digital)', 'Un cliente intenta reportar muestras negativas de calidad del aire (samples = -450), violando las reglas semánticas.');
+        document.getElementById('wire-c1').classList.add('active');
+
+        animatePacket(c1, srv, 'packet-corrupt', 'ERROR: samples = -450', '⚠️', () => {
+          document.getElementById('server-status').textContent = '¡ALERTA! Muestras inválidas';
+          document.getElementById('server-status').style.color = '#f87171';
+          setStory('🛡️', '¡Aduana Activada!', 'El código del Servidor detecta que las muestras no pueden ser negativas. Rechaza el mensaje antes de que contamine el modelo.');
+
+          setTimeout(() => {
+            animatePacket(srv, c1, 'packet-corrupt', 'Status: ERROR 400', '⛔', () => {
+              setStory('🔒', 'Seguridad y Robustez Garantizada', 'El servidor devolvió un rechazo controlado sin caerse ni corromper los cálculos de las demás máquinas.');
+            });
+          }, 1200);
+        });
+
+      } else if (type === 'full') {
+        // Demostración completa de Aprendizaje Federado
+        setStory('🌐', '1. Coordinación Global', 'El Servidor distribuye la receta actual de predicción de aire a la PC y a la Raspberry Pi.');
+        
+        animatePacket(srv, c1, 'packet-json', 'Modelo Base', '🧠', () => {
+          animatePacket(srv, c2, 'packet-json', 'Modelo Base', '🧠', () => {
+            document.getElementById('client1-status').textContent = 'Entrenando localmente...';
+            document.getElementById('client2-status').textContent = 'Entrenando localmente...';
+            setStory('🔒', '2. Privacidad Absoluta', 'Ambos clientes entrenan con sus propios datos de calidad del aire en secreto. ¡Ningún registro sale a la calle!');
+
+            setTimeout(() => {
+              setStory('📈', '3. Enviando solo Aprendizajes', 'Los clientes solo envían sus pequeñas mejoras numéricas (deltas) al Coordinador.');
+              animatePacket(c1, srv, 'packet-json', 'Mejoras PC (Delta)', '📊', () => {
+                animatePacket(c2, srv, 'packet-json', 'Mejoras RPi (Delta)', '📊', () => {
+                  document.getElementById('server-status').textContent = 'Combinando (FedAvg)...';
+                  setStory('✨', '4. Fusión Federada (FedAvg)', 'El Servidor combina matemáticamente las dos mejoras en un modelo mucho más inteligente para toda la ciudad.');
+                });
+              });
+            }, 1800);
+          });
+        });
+      }
+    }
+
+    // Inicializar al cargar
+    window.onload = () => {
+      setTimeout(updateWireCoordinates, 200);
+    };
+  </script>
+</body>
+</html>

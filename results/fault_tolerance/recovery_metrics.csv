@@ -1,0 +1,3 @@
+test_id,recovery_type,recovery_time_ms,restored_round,restored_model_version,data_loss
+E07,CHECKPOINT_RESTORATION,9.118795394897461,2,2,0_UPDATES
+E08,IDEMPOTENT_FILTERING,0.05,2,2,0_CORRUPTIONS

@@ -1,6 +1,5 @@
 """
-Workshop 7: Servidor Coordinador de Servicios Distribuidos (JSON/XML)
-Sistemas Distribuidos - Semestre II 2026 - Prof. Francisco Hidrobo
+
 
 Este componente corresponde al Servidor Coordinador (Nodo 0) en la arquitectura distribuida.
 Ofrece dos servicios de red:
@@ -129,11 +128,11 @@ def run_server(host: str = "0.0.0.0", port: int = 5000):
     server_sock.listen(5)
 
     print("=" * 80)
-    print("SERVIDOR COORDINADOR (NODO 0) - WORKSHOP 7: INTERCAMBIO JSON / XML")
+    print("SERVIDOR COORDINADOR (NODO 0) - INTERCAMBIO JSON / XML")
     print(f"Dirección de escucha: {host}:{port}")
     print("Servicios disponibles:")
-    print("  1. 'get_global_model' (Actividad 1 - Con JSON Schema y XML XSD)")
-    print("  2. 'training_report'  (Actividad 2 - Validación semántica en código)")
+    print("  1. 'get_global_model' (1 - Con JSON Schema y XML XSD)")
+    print("  2. 'training_report'  (2 - Validación semántica en código)")
     print("Esperando conexiones entrantes de clientes distribuidos...")
     print("=" * 80)
 

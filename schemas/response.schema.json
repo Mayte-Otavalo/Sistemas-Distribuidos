@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ResponseSchema",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["success", "received", "error"]
+    },
+    "round": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "model_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "message": {
+      "type": "string"
+    },
+    "client_id": {
+      "type": "string"
+    }
+  },
+  "required": ["status", "round", "message"],
+  "additionalProperties": true
+}
