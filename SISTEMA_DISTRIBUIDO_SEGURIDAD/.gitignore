@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Claves de cifrado simétrico (FERNET) - SEGURIDAD
+*.key
+.client_*.key
+.secrets/
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Checkpoints y logs de ejecución
+server/checkpoints/*.json
+server/logs/*.log
+!server/checkpoints/.gitkeep
+!server/logs/.gitkeep

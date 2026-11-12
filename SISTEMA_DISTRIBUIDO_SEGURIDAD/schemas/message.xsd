@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Elemento Raíz: Request o Response -->
+  <xs:element name="message">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="request" type="RequestType"/>
+        <xs:element name="response" type="ResponseType"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="request" type="RequestType"/>
+  <xs:element name="response" type="ResponseType"/>
+
+  <xs:complexType name="RequestType">
+    <xs:sequence>
+      <xs:element name="client_id">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="client_1"/>
+            <xs:enumeration value="client_2"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="service">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="get_global_model"/>
+            <xs:enumeration value="ping"/>
+            <xs:enumeration value="disconnect"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="round" type="xs:nonNegativeInteger"/>
+      <xs:element name="format">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="json"/>
+            <xs:enumeration value="xml"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ResponseType">
+    <xs:sequence>
+      <xs:element name="status">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="success"/>
+            <xs:enumeration value="received"/>
+            <xs:enumeration value="error"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="round" type="xs:nonNegativeInteger"/>
+      <xs:element name="model_version" type="xs:nonNegativeInteger" minOccurs="0"/>
+      <xs:element name="message" type="xs:string"/>
+      <xs:element name="client_id" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
